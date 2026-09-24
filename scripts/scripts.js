@@ -103,6 +103,27 @@ function decorateSectionMetadata(main) {
     sm.remove();
     if (!wrapper.children.length) wrapper.remove();
   });
+  /* In production aem.live already applies section-metadata server-side:
+     the table is gone and the section arrives with data-background. The
+     query (?width=750…) is dropped to keep the original image, as locally. */
+  main.querySelectorAll(':scope > .section[data-background]').forEach((section) => {
+    if (!section.style.backgroundImage) {
+      section.style.backgroundImage = cssUrl(section.dataset.background.split('?')[0]);
+    }
+  });
+}
+
+/**
+ * DA stores the authored strikethrough <s> as <del>; restore <s> so the
+ * blocks and the CSS ported from the prototype keep matching it.
+ * @param {Element} main The main element
+ */
+function restoreStrikethrough(main) {
+  main.querySelectorAll('del').forEach((del) => {
+    const s = document.createElement('s');
+    s.append(...del.childNodes);
+    del.replaceWith(s);
+  });
 }
 
 /**
@@ -204,6 +225,7 @@ function decorateButtons(main) {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  restoreStrikethrough(main);
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
