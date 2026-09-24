@@ -1,0 +1,18 @@
+.hlx/*
+coverage/*
+logs/*
+node_modules/*
+
+helix-importer-ui
+.DS_Store
+*.bak
+.idea
+
+# credenciales y material de trabajo del pipeline (no se sirven)
+.env
+import-work/
+drafts/
+
+# Ensure these files are tracked
+!CLAUDE.md
+!AGENTS.md
