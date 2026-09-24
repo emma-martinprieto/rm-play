@@ -1,0 +1,113 @@
+/* Sticky CTA bar (prototype html:L377-408). The bar lives in <body>, so selectors are not block-prefixed.
+   Misma jerarquía que la card del hero: el mensual manda, el anual explica. */
+.sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px var(--grid-margin-mobile);
+  background: var(--color-glass-dark);
+  /* stylelint-disable-next-line property-no-vendor-prefix -- literal port (Safari < 18) */
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  transform: translateY(100%);
+  transition: transform .3s ease;
+}
+
+.sticky.is-visible { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sticky { transition: none; }
+}
+
+@media (width >= 768px) {
+  .sticky { padding-inline: var(--grid-margin-tablet); }
+}
+
+@media (width >= 1024px) {
+  .sticky { padding-inline: var(--grid-margin-desktop); }
+}
+
+@media (width >= 1440px) {
+  .sticky { padding-inline: var(--grid-margin-wide); }
+}
+
+.sticky-price { min-width: 0; }
+
+.sp-main {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.sp-solo {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-premium-start);
+}
+
+.sp-main strong {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -.8px;
+}
+
+.sp-per {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-inverse-soft);
+}
+
+.sp-off {
+  align-self: center;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-premium);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.sp-sub {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--color-text-inverse-soft);
+}
+
+.sp-sub s {
+  margin-left: 6px;
+  font-weight: 500;
+  color: var(--color-text-inverse-quiet);
+}
+
+.sticky .label-short { display: none; }
+
+@media (width <= 640px) {
+  .sticky .btn {
+    padding: 12px 16px;
+    white-space: nowrap;
+  }
+
+  .sticky .label-long { display: none; }
+  .sticky .label-short { display: inline; }
+  .sp-main strong { font-size: 22px; }
+}
+
+/* En pantallas muy estrechas el pill no cabe junto al botón: el tachado ya cuenta el descuento */
+@media (width <= 420px) {
+  .sp-off { display: none; }
+}

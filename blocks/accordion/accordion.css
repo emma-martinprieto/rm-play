@@ -1,0 +1,88 @@
+/* Accordion — FAQ (prototype html:L335-337, 368-375, 693-700) */
+
+/* stylelint-disable no-duplicate-selectors -- literal port, the prototype declares summary twice */
+
+/* `.faq-title + .faq{margin-top:0}` wins over `.faq{margin-top:64px}` in the prototype: effective value 0 */
+.accordion .faq {
+  align-self: stretch;
+  margin-top: 0;
+  border-top: 1px solid rgb(15 33 69 / 14%);
+}
+
+.section.light-panel .accordion { align-self: stretch; }
+
+.accordion .faq details {
+  border-bottom: 1px solid rgb(15 33 69 / 14%);
+  padding: 24px 0;
+}
+
+.accordion .faq summary {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.accordion .faq summary::-webkit-details-marker { display: none; }
+
+.accordion .faq ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.65;
+  display: grid;
+  gap: 4px;
+}
+
+.accordion .faq a {
+  color: var(--color-text-primary);
+  text-underline-offset: 3px;
+}
+
+.accordion .faq a:focus-visible {
+  outline: 3px solid var(--color-primary-light);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.accordion .faq p {
+  margin: 16px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.65;
+  max-width: 72ch;
+}
+
+/* Afordancia de abrir/cerrar en la FAQ */
+.accordion .faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.accordion .faq summary::after {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: rotate(45deg) translateY(-25%);
+  transition: transform .25s ease;
+}
+
+.accordion .faq details[open] summary::after { transform: rotate(-135deg) translateY(-25%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion .faq summary::after { transition: none; }
+}
+
+.accordion .faq summary:focus-visible {
+  outline: 3px solid var(--color-primary-light);
+  outline-offset: 4px;
+  border-radius: 8px;
+}

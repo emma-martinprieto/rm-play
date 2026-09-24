@@ -10,84 +10,149 @@
  * governing permissions and limitations under the License.
  */
 
+/*
+ * rm-play — faithful port of the prototype (import-work/prototype/index.html).
+ * Values are the prototype's literal values (html:L14-98, 99-108, 148-166, 386-389, 705-706).
+ * Cascade order matters (ported from the prototype): keep rule order.
+ */
+
+/* stylelint-disable no-descending-specificity, no-duplicate-selectors, custom-property-pattern --
+   the prototype repeats selectors on purpose (cascade order) and uses --_a */
+
+/* ===========================================================
+   TOKENS — nomenclatura de tokens.css (Cibeles DS v4.0)
+   ✅ = existe ya en tokens.css de producción
+   🆕 = token nuevo propuesto por este proyecto (documentar en el DS)
+   =========================================================== */
 :root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+  /* Color · primary ✅ */
+  --color-primary: #3E31FA;
+  --color-primary-dark: #2115AB;
+  --color-primary-medium: #8FA0F5;
+  --color-primary-light: #DEE5FD;
+  --color-primary-bg: #EEF2FD;
+  --color-secondary: #8760F6;
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* Color · superficies ✅ */
+  --color-bg-dark: #0A0A0A;
+  --color-off-black: #14142B;
+  --color-surface-light: #F3F5F8;
+  --color-line: #E1E5EA;
 
-  /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 19px;
-  --body-font-size-xs: 17px;
+  /* Color · texto ✅ */
+  --color-text-primary: #0F2145;
+  --color-text-secondary: #43526E;
+  --color-text-muted: #5E6A83;
+  --color-text-inverse: rgb(255 255 255 / 100%);
+  --color-text-inverse-muted: rgb(255 255 255 / 65%);
+  --color-text-inverse-subtle: rgb(255 255 255 / 45%); /* 4,49:1 sobre #14142B: no llega a AA en texto <18px. Aquí solo decorativo */
 
-  /* heading sizes */
-  --heading-font-size-xxl: 55px;
-  --heading-font-size-xl: 44px;
-  --heading-font-size-l: 34px;
-  --heading-font-size-m: 27px;
-  --heading-font-size-s: 24px;
-  --heading-font-size-xs: 22px;
+  /* 🆕 Texto sobre oscuro — escalones que faltan entre los de producción */
+  --color-text-inverse-soft: rgb(255 255 255 / 82%); /* bajadas y texto sobre foto · 12,3:1 */
+  --color-text-inverse-quiet: rgb(255 255 255 / 55%); /* notas, metadatos, tachados · 6,1:1 (sustituye a subtle en texto) */
 
-  /* nav height */
-  --nav-height: 64px;
+  /* 🆕 Color · premium — en tokens.css solo existen dentro de --gradient-premium, no como color suelto */
+  --color-premium-start: #E4D0AB; /* = inicio de --gradient-premium. Acento dorado */
+  --color-premium-end: #F3F6F9; /* = final de --gradient-premium */
+  --color-premium-tint: rgb(228 208 171 / 12%); /* fondo de iconos y reflejos */
+  --color-premium-line: rgb(228 208 171 / 35%); /* filos de cards y banner */
+  --color-premium-line-strong: rgb(228 208 171 / 45%); /* filo en hover y candado */
+
+  /* 🆕 Glass — para etiquetas sobre miniatura */
+  --color-glass-92: rgb(255 255 255 / 92%);
+  --color-glass-72: rgb(255 255 255 / 72%);
+  --color-glass-dark: rgb(10 10 10 / 75%); /* barra sticky: deja intuir el contenido de detrás */
+  --color-line-inverse: rgb(255 255 255 / 24%); /* 🆕 filo de controles sobre fondo oscuro (selector de idioma, flechas de fila) */
+
+  /* Gradientes ✅ */
+  --gradient-btn-primary: linear-gradient(4deg,#3E31FA 19.1%,#8760F6 94.27%);
+  --gradient-premium: linear-gradient(135deg,#E4D0AB 0%,#F3F6F9 100%);
+  --gradient-card-dark: linear-gradient(155deg,#14142B 0%,#0A0A0A 100%);
+
+  /* 🆕 Gradientes de esta landing */
+  --gradient-hero-light: linear-gradient(141deg,#EFEEEF 43%,#E4D0AB 90%);
+  --gradient-scrim-card: linear-gradient(180deg,rgb(15 33 69 / 0%) 45%,rgb(10 10 10 / 90%) 100%);
+
+  /* Botones ✅ */
+  --btn-primary-shadow: 0 10px 24px -8px rgb(54 49 116 / 65%);
+  --btn-primary-bg-hover: var(--color-primary);
+  --btn-focus-ring: 0 0 0 3px var(--color-primary-light);
+
+  /* 🆕 Botón Premium — CTA blanco sobre oscuro (el primario violeta es el color de Free) */
+  --btn-premium-bg: #FFFFFF; /* stylelint-disable-line color-hex-length -- verbatim token */
+  --btn-premium-bg-hover: var(--color-premium-end);
+  --btn-premium-text: var(--color-text-primary); /* 15,9:1 */
+  --btn-premium-shadow: 0 10px 24px -10px rgb(0 0 0 / 60%);
+  --btn-premium-shadow-hover: 0 14px 28px -10px rgb(0 0 0 / 70%);
+  --btn-premium-focus: 3px solid var(--color-premium-start);
+
+  /* 🆕 Sombras — no existen en tokens.css */
+  --shadow-card-tier: 0 8px 32px -8px rgb(0 0 0 / 45%);
+
+  /* Brillo de hover: el tono de sombra del DS (84,77,182), más intenso para que se lea sobre negro */
+  --shadow-card-hover: 0 24px 56px -16px rgb(84 77 182 / 62%),0 0 0 1px rgb(135 96 246 / 22%);
+  --shadow-premium-glow: 0 -24px 80px -24px rgb(228 208 171 / 24%); /* halo del panel dorado */
+
+  /* Espaciado ✅ — escala ×8 */
+  --spacing-2xs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-base: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  --spacing-2xl: 64px;
+  --spacing-section: 96px;
+  --spacing-3xl: 128px;
+
+  /* Radios ✅ */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  --radius-pill: 9999px;
+  --btn-radius: var(--radius-md);
+
+  /* Retícula Cibeles: margen 64 y container ~897 a 1025; margen 96 y container 1248 a 1440+ */
+  --grid-margin-mobile: 24px;
+  --grid-margin-tablet: 40px;
+  --grid-margin-desktop: 64px;
+  --grid-margin-wide: 96px;
+  --grid-gutter-mobile: 24px;
+  --grid-gutter-tablet: 24px;
+  --grid-gutter-desktop: 24px;
+  --grid-gutter-wide: 32px;
+
+  /* Tipografía ✅ (tokens.css solo declara 'RM Neue', sans-serif; Inter y el resto son fallback de maqueta)
+     FLAG: RM Neue no se entrega en el ZIP -> se pinta Inter (si está instalada) o la fuente del sistema. */
+  /* stylelint-disable-next-line value-keyword-case -- verbatim prototype font stack */
+  --font-family: "RM Neue","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 
-/* fallback fonts */
-@font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
-  src: local('Arial');
-}
+/* ---------- Base (prototype html:L99-103) ---------- */
+* { box-sizing: border-box; }
 
-@font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
-}
-
-@media (width >= 900px) {
-  :root {
-    /* body sizes */
-    --body-font-size-m: 18px;
-    --body-font-size-s: 16px;
-    --body-font-size-xs: 14px;
-
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
-    --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  display: none;
-  margin: 0;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: var(--body-font-family);
-  font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  font-family: var(--font-family);
+  background: var(--color-bg-dark);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
 }
 
-body.appear {
-  display: block;
-}
+img { max-width: 100%; }
 
-header {
-  height: var(--nav-height);
-}
+/* EDS: body is revealed once the first section is decorated */
+body { display: none; }
+body.appear { display: block; }
 
+/* EDS: header/footer blocks stay hidden until decorated */
 header .header,
 footer .footer {
   visibility: hidden;
@@ -98,190 +163,513 @@ footer .footer[data-block-status="loaded"] {
   visibility: visible;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
-  font-family: var(--heading-font-family);
+/* section{position:relative} */
+main > .section { position: relative; }
+
+/* .container → every section wrapper (default-content-wrapper, *-wrapper) + the hero inner container */
+main > .section > div,
+.hero .container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--grid-margin-mobile);
+}
+
+@media (width >= 768px) {
+  main > .section > div,
+  .hero .container { padding: 0 var(--grid-margin-tablet); }
+}
+
+@media (width >= 1024px) {
+  main > .section > div,
+  .hero .container { padding: 0 var(--grid-margin-desktop); }
+}
+
+@media (width >= 1440px) {
+  main > .section > div,
+  .hero .container { padding: 0 var(--grid-margin-wide); }
+}
+
+/* The hero section and the overlays section are not .container in the prototype */
+main > .section.hero-container > div,
+main > .section.overlays > div {
+  max-width: none;
+  padding: 0;
+}
+
+h1 {
+  font-size: clamp(40px,6.6vw,72px);
+  line-height: 1.02;
+  letter-spacing: -2px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  max-width: 15ch;
+}
+
+/* ---------- Botones (html:L148-162) ---------- */
+
+/* CTA Premium: blanco sólido con texto marino. El gradiente violeta es el color de Free. */
+.btn {
+  font-family: inherit;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 1.25;
-  scroll-margin: 40px;
+  line-height: 24px;
+  border: 0;
+  border-radius: 12px;
+  padding: 16px 36px;
+  cursor: pointer;
+  color: var(--btn-premium-text);
+  background: var(--btn-premium-bg);
+  box-shadow: var(--btn-premium-shadow);
+  transition: background-color .2s ease,transform .2s ease,box-shadow .2s ease;
 }
 
-h1 { font-size: var(--heading-font-size-xxl); }
-h2 { font-size: var(--heading-font-size-xl); }
-h3 { font-size: var(--heading-font-size-l); }
-h4 { font-size: var(--heading-font-size-m); }
-h5 { font-size: var(--heading-font-size-s); }
-h6 { font-size: var(--heading-font-size-xs); }
-
-p,
-dl,
-ol,
-ul,
-pre,
-blockquote {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
-}
-
-code,
-pre {
-  font-size: var(--body-font-size-s);
-}
-
-pre {
-  padding: 16px;
-  border-radius: 8px;
-  background-color: var(--light-color);
-  overflow-x: auto;
-  white-space: pre;
-}
-
-main > div {
-  margin: 40px 16px;
-}
-
-input,
-textarea,
-select,
-button {
-  font: inherit;
-}
-
-/* links */
-a:any-link {
-  color: var(--link-color);
+/* EDS addition: a CTA with a real destination stays a link and must look like the <button> */
+a.btn {
+  display: inline-block;
+  text-align: center;
   text-decoration: none;
-  overflow-wrap: break-word;
 }
 
-a:hover {
-  color: var(--link-hover-color);
-  text-decoration: underline;
+.btn:hover {
+  background: var(--btn-premium-bg-hover);
+  box-shadow: var(--btn-premium-shadow-hover);
 }
 
-/* buttons */
-p.button-wrapper {
-  margin: 12px 0;
+.btn:focus-visible {
+  outline: var(--btn-premium-focus);
+  outline-offset: 3px;
 }
 
-a.button:any-link,
-button.button {
-  box-sizing: border-box;
+@media (prefers-reduced-motion: no-preference) {
+  .btn:hover { transform: translateY(-1px); }
+}
+
+.btn.light { box-shadow: none; }
+
+/* Botón principal del DS (gradiente violeta). Solo en el CTA del hero, por decisión de negocio (21/09/2026) */
+.btn.primary {
+  color: #fff;
+  background: var(--gradient-btn-primary);
+  box-shadow: var(--btn-primary-shadow);
+}
+
+/* Hover y foco como define el DS: fondo sólido --color-primary y anillo primary-light */
+.btn.primary:hover {
+  background: var(--btn-primary-bg-hover);
+  box-shadow: var(--btn-primary-shadow);
+}
+
+.btn.primary:focus-visible {
+  outline: 0;
+  box-shadow: var(--btn-primary-shadow),var(--btn-focus-ring);
+}
+
+/* Sobre superficie clara (lightbox) el blanco desaparece: versión oscura */
+.btn.dark {
+  background: var(--color-off-black);
+  color: #fff;
+}
+
+.btn.dark:hover { background: #000; }
+
+/* Pill — misma forma y tipografía en hero, cards, beneficios y plan; cambia sólo el color */
+.eyebrow,
+.tag,
+.promo {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  max-width: 100%;
-  margin: 0;
-  border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
-  font: inherit;
-  font-weight: 500;
-  line-height: 1.25;
-  text-decoration: none;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
   white-space: nowrap;
 }
 
-a.button[aria-disabled="true"],
-button.button:disabled {
-  cursor: not-allowed;
-  pointer-events: none;
+.eyebrow {
+  color: var(--color-text-primary);
+  background: var(--gradient-premium);
+  margin-bottom: 24px;
 }
 
-a.button.primary,
-button.button.primary {
-  border-color: var(--text-color);
-  background-color: var(--text-color);
-  color: var(--background-color);
+.promo {
+  margin-bottom: 24px;
+  background: var(--gradient-premium);
+  color: var(--color-text-primary);
 }
 
-a.button.primary:hover,
-a.button.primary:focus-visible,
-button.button.primary:hover,
-button.button.primary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--dark-color);
-  color: var(--light-color);
+/* Interruptor de la promo: con data-promo="on" en <body> se ven pills y precios rebajados;
+   al quitar el metadato Promo vuelve el precio normal y el lightbox no se abre. */
+body[data-promo="on"] .no-promo { display: none; }
+body:not([data-promo="on"]) .promo-only { display: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0); /* stylelint-disable-line property-no-deprecated -- literal .sr-only */
+  white-space: nowrap;
+  border: 0;
 }
 
-a.button.primary[aria-disabled="true"],
-a.button.primary[aria-disabled="true"]:hover,
-a.button.primary[aria-disabled="true"]:focus-visible,
-button.button.primary:disabled,
-button.button.primary:disabled:hover,
-button.button.primary:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
+/* ---------- CAPÍTULOS: .chapter.bg.bg-soft → .section.photo-section (html:L213-221) ---------- */
+.section.photo-section {
+  padding-block: 64px 80px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
 }
 
-a.button.secondary,
-button.button.secondary {
-  border-color: var(--text-color);
-  background-color: transparent;
-  color: var(--text-color);
+@media (width >= 1024px) {
+  .section.photo-section { padding-block: 96px 120px; }
 }
 
-a.button.secondary:hover,
-a.button.secondary:focus-visible,
-button.button.secondary:hover,
-button.button.secondary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--light-color);
-  color: var(--dark-color);
+.section.photo-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,var(--color-bg-dark) 0%,rgb(10 10 10 / 60%) 12%,rgb(10 10 10 / 28%) 32%,rgb(10 10 10 / 40%) 68%,rgb(10 10 10 / 72%) 88%,var(--color-bg-dark) 100%);
 }
 
-a.button.secondary[aria-disabled="true"],
-a.button.secondary[aria-disabled="true"]:hover,
-a.button.secondary[aria-disabled="true"]:focus-visible,
-button.button.secondary:disabled,
-button.button.secondary:disabled:hover,
-button.button.secondary:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
+.section.photo-section > div {
+  position: relative;
+  z-index: 2;
 }
 
-/* high-impact call-to-action */
-a.button.accent,
-button.button.accent {
-  border-color: var(--link-color);
-  background-color: var(--link-color);
-  color: var(--background-color);
+.section.photo-section .default-content-wrapper > h2 {
+  font-size: clamp(30px,3.6vw,52px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  margin: 0 0 16px;
+  max-width: 18ch;
 }
 
-a.button.accent:hover,
-a.button.accent:focus-visible,
-button.button.accent:hover,
-button.button.accent:focus-visible {
-  border-color: var(--link-hover-color);
-  background-color: var(--link-hover-color);
+.section.photo-section .default-content-wrapper > p {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--color-text-inverse-muted);
+  margin: 0 0 48px;
+  max-width: 56ch;
 }
 
-a.button.accent[aria-disabled="true"],
-a.button.accent[aria-disabled="true"]:hover,
-a.button.accent[aria-disabled="true"]:focus-visible,
-button.button.accent:disabled,
-button.button.accent:disabled:hover,
-button.button.accent:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
+/* 02 · top10 → .section.most-viewed (html:L603-606) */
+
+/* Foto más arriba y fundido más corto: antes quedaba una franja negra larga sobre el título */
+.section.most-viewed { background-position: right bottom; }
+
+/* La foto es 16:9 y ya llena el alto: se agranda un 20 % para poder subirla */
+@media (width >= 1024px) {
+  .section.most-viewed { background-size: auto 120%; }
 }
 
-main img {
-  max-width: 100%;
-  width: auto;
-  height: auto;
+.section.most-viewed::before {
+  background: linear-gradient(180deg,var(--color-bg-dark) 0%,rgb(10 10 10 / 45%) 6%,rgb(10 10 10 / 22%) 22%,rgb(10 10 10 / 34%) 70%,rgb(10 10 10 / 66%) 90%,var(--color-bg-dark) 100%);
+}
+
+/* 03 · .cat → .section.discover (html:L544-546) */
+.section.discover > div { text-align: center; }
+
+/* Mismo titular que el resto de secciones */
+.section.discover .default-content-wrapper > h2 {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+/* 04 · .perks → .section.membership (html:L611-614; .perks gana a .chapter) */
+.section.membership { padding-block: 80px; }
+
+@media (width >= 1024px) {
+  .section.membership { padding-block: 112px 96px; }
+}
+
+.section.membership .default-content-wrapper > h2 {
+  font-size: clamp(30px,3.6vw,52px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  margin: 0 0 16px;
+}
+
+.section.membership .default-content-wrapper > p {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--color-text-inverse-muted);
+  margin: 0 0 40px;
+  max-width: 56ch;
+}
+
+/* 05 · .close → .section.light-panel (html:L328-336) */
+
+/* Panel claro sobre el fondo oscuro: un fundido negro→claro siempre pasa por gris, así que el cambio es de forma */
+.section.light-panel {
+  background: var(--gradient-hero-light);
+  color: var(--color-text-primary);
+  padding-block: 80px;
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-premium-glow);
+}
+
+@media (width >= 1024px) {
+  .section.light-panel {
+    padding-block: 96px;
+    border-radius: 48px;
+  }
+}
+
+.section.light-panel > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section.light-panel .default-content-wrapper > h2 {
+  align-self: stretch;
+  margin: 0 0 32px;
+  font-size: clamp(28px,3vw,40px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+/* 06 · .container.endcap → .section.closing (html:L641-642) */
+.section.closing { padding-block: 80px 0; }
+
+@media (width >= 1024px) {
+  .section.closing { padding-block: 112px 0; }
+}
+
+/* ---------- Card de contenido compartida: cards (ranking) + tabs (categories) (html:L249-277, 524-539) ---------- */
+.cards.ranking .card,
+.tabs.categories .card {
+  position: relative;
+  border-radius: 32px;
+  overflow: hidden;
+  background: var(--gradient-card-dark);
+  box-shadow: var(--shadow-card-tier);
+  display: flex;
+  flex-direction: column;
+}
+
+.cards.ranking .thumb,
+.tabs.categories .thumb {
+  position: relative;
+  aspect-ratio: 5/3;
+  overflow: hidden;
+}
+
+.cards.ranking .thumb .art,
+.tabs.categories .thumb .art {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(100% * (1 + var(--f)));
+  background-size: cover;
+  background-position: center;
+  transition: transform .5s ease;
+}
+
+/* Parallax 3D en hover: la card gira hacia el otro lado y la imagen (más ancha que el marco) se desplaza */
+.cards.ranking .card,
+.tabs.categories .card {
+  --f: .08;
+  --_a: calc(90deg * var(--f));
+
+  transition: transform .5s ease,box-shadow .5s ease;
+}
+
+/* Aparición escalonada (script 4c): usa `translate` (no `transform`) para no pisar la inclinación de las cards.
+   Oculta sólo con JS activo (clase .js en <html>) y sin movimiento reducido. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .hero-copy > *,
+  .js .hero-side > *,
+  .js .perks-grid > *,
+  .js .cards-row > * {
+    opacity: 0;
+    translate: 0 24px;
+    transition: opacity .6s ease var(--d,0ms),translate .6s cubic-bezier(.2,.7,.2,1) var(--d,0ms);
+  }
+
+  .js .cards-row > .card {
+    transition: transform .5s ease,box-shadow .5s ease,
+      opacity .6s ease var(--d,0ms),translate .6s cubic-bezier(.2,.7,.2,1) var(--d,0ms);
+  }
+
+  .js .is-in > * {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cards.ranking .card,
+  .tabs.categories .card { transform: perspective(1200px) rotateY(var(--_a)); }
+
+  .cards.ranking .card:hover,
+  .cards.ranking .card:focus-within,
+  .cards.ranking .card-cta:focus-visible,
+  .tabs.categories .card:hover,
+  .tabs.categories .card:focus-within {
+    transform: perspective(1200px) rotateY(calc(-1 * var(--_a)));
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .cards.ranking .card:hover .art,
+  .cards.ranking .card:focus-within .art,
+  .tabs.categories .card:hover .art,
+  .tabs.categories .card:focus-within .art { transform: translateX(calc(-100% * var(--f) / (1 + var(--f)))); }
+}
+
+.cards.ranking .thumb::after,
+.tabs.categories .thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-scrim-card);
+}
+
+.cards.ranking .tag,
+.tabs.categories .tag {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  background: var(--color-glass-92);
+  color: var(--color-text-primary);
+}
+
+.cards.ranking .dur,
+.tabs.categories .dur {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 2;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+}
+
+.cards.ranking .card-body,
+.tabs.categories .card-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cards.ranking .card-body h3,
+.tabs.categories .card-body h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* 14 px: literal del código (brief §0, sin mejoras a11y) */
+.cards.ranking .card-body p,
+.tabs.categories .card-body p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-inverse-quiet);
+}
+
+/* Etiqueta de acceso: pasa a la derecha para no chocar con el rank (html:L473) */
+.cards.ranking .tag,
+.tabs.categories .tag {
+  left: auto;
+  right: 16px;
+}
+
+/* ---------- CARD BLOQUEADA AL TOCARLA (html:L524-539, /scripts/card-lock.js) ---------- */
+.card-open {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.card-open:focus-visible {
+  outline: 3px solid var(--color-premium-start);
+  outline-offset: -3px;
+}
+
+.lock {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  text-align: center;
+  background: rgb(10 10 10 / 74%);
+  /* stylelint-disable-next-line property-no-vendor-prefix -- literal port (Safari < 18) */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease,visibility 0s linear .25s;
+}
+
+.card.is-locked .lock {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .25s ease;
+}
+
+.lock-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-premium-tint);
+  border: 1px solid var(--color-premium-line-strong);
+  color: var(--color-premium-start);
+}
+
+.lock-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: currentcolor;
+}
+
+.lock p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--color-text-inverse-soft);
+}
+
+.lock .btn { padding: 12px 20px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* El candado «cae» en su sitio: un rebote corto que se lee como cierre */
+  .card.is-locked .lock-icon { animation: lock-in .4s cubic-bezier(.2,1.6,.4,1); }
+
+  @keyframes lock-in {
+    from {
+      scale: .6;
+      translate: 0 -6px;
+    }
+
+    to {
+      scale: 1;
+      translate: 0 0;
+    }
+  }
 }
 
 .icon {
@@ -293,33 +681,4 @@ main img {
 .icon img {
   height: 100%;
   width: 100%;
-}
-
-/* sections */
-main > .section {
-  margin: 40px 0;
-}
-
-main > .section > div {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 24px;
-}
-
-main > .section:first-of-type {
-  margin-top: 0;
-}
-
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
-}
-
-/* section metadata */
-main .section.light,
-main .section.highlight {
-  background-color: var(--light-color);
-  margin: 0;
-  padding: 40px 0;
 }

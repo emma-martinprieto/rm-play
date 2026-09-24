@@ -1,20 +1,75 @@
+/* Footer — port of prototype html:L440-448 (+ .container L105-108).
+   Padding inferior extra para que la barra sticky no tape los enlaces. */
+
+/* stylelint-disable no-descending-specificity */
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  padding-block: 64px 128px;
+  color: var(--color-text-inverse-quiet);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+footer .container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--grid-margin-mobile);
 }
 
-footer .footer p {
+@media (width >= 768px) {
+  footer .container { padding: 0 var(--grid-margin-tablet); }
+}
+
+@media (width >= 1024px) {
+  footer .container { padding: 0 var(--grid-margin-desktop); }
+}
+
+@media (width >= 1440px) {
+  footer .container { padding: 0 var(--grid-margin-wide); }
+}
+
+footer .footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+footer a {
+  color: inherit;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+
+footer a:hover { color: #fff; }
+
+footer a:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+footer .footer-sponsors {
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-text-inverse-soft);
+}
+
+footer .footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 24px;
+  list-style: none;
   margin: 0;
+  padding: 0;
 }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
-  }
+footer .footer-copy {
+  margin: 0;
+  padding-top: 24px;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  width: 100%;
+  color: var(--color-text-inverse-quiet);
 }

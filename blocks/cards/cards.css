@@ -1,4 +1,7 @@
-.cards > ul {
+/* stylelint-disable no-descending-specificity */
+
+/* ===== default (Block Collection) cards — not used by rm-play variants ===== */
+.cards:not(.ranking, .advantages) > ul {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -7,21 +10,337 @@
   gap: 24px;
 }
 
-.cards > ul > li {
+.cards:not(.ranking, .advantages) > ul > li {
   border: 1px solid #dadada;
   background-color: var(--background-color);
 }
 
-.cards .cards-card-body {
-  margin: 16px;
-}
+.cards:not(.ranking, .advantages) .cards-card-body { margin: 16px; }
+.cards:not(.ranking, .advantages) .cards-card-image { line-height: 0; }
 
-.cards .cards-card-image {
-  line-height: 0;
-}
-
-.cards > ul > li img {
+.cards:not(.ranking, .advantages) > ul > li img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+}
+
+/* ===== ranking — «Lo más visto» (prototype html:L223-248, 279-289, 456-470).
+   Shared .card/.thumb/.lock rules live in styles/styles.css. The prototype row `.cards` is `.cards-row`. ===== */
+
+/* Fila a sangre: cards de 400px con scroll horizontal; scroll-padding = margen de la retícula */
+.cards.ranking .cards-wrap {
+  --row-margin: var(--grid-margin-mobile);
+
+  position: relative;
+}
+
+@media (width >= 768px) {
+  .cards.ranking .cards-wrap { --row-margin: var(--grid-margin-tablet); }
+}
+
+@media (width >= 1024px) {
+  .cards.ranking .cards-wrap { --row-margin: var(--grid-margin-desktop); }
+}
+
+@media (width >= 1440px) {
+  .cards.ranking .cards-wrap { --row-margin: var(--grid-margin-wide); }
+}
+
+.cards.ranking .cards-row {
+  display: flex;
+  gap: var(--grid-gutter-mobile);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding-block: 16px;
+  margin-top: -16px;
+  margin-inline: calc(-1 * var(--row-margin));
+  padding-inline: var(--row-margin);
+  scroll-padding-inline: var(--row-margin);
+}
+
+.cards.ranking .cards-row::-webkit-scrollbar { display: none; }
+
+@media (hover: hover) {
+  .cards.ranking .cards-row { cursor: grab; }
+}
+
+.cards.ranking .cards-row.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.cards.ranking .cards-row > * {
+  flex: 0 0 400px;
+  scroll-snap-align: start;
+}
+
+@media (width <= 479px) {
+  .cards.ranking .cards-row > * { flex-basis: calc(100vw - 72px); }
+}
+
+@media (width >= 1440px) {
+  .cards.ranking .cards-row { gap: var(--grid-gutter-wide); }
+}
+
+/* Flechas de fila al estilo RM Play: sólo con ratón, aparecen al pasar por la fila, centradas en la miniatura */
+.cards.ranking .row-arrow {
+  position: absolute;
+  top: 136px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: rgb(10 10 10 / 56%);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity .2s ease,background-color .2s ease;
+}
+
+.cards.ranking .row-arrow svg {
+  width: 24px;
+  height: 24px;
+  fill: currentcolor;
+}
+
+.cards.ranking .row-arrow.prev { left: calc(-1 * var(--row-margin) + 24px); }
+.cards.ranking .row-arrow.next { right: calc(-1 * var(--row-margin) + 24px); }
+
+.cards.ranking .cards-wrap:hover .row-arrow,
+.cards.ranking .row-arrow:focus-visible { opacity: 1; }
+
+.cards.ranking .row-arrow:hover { background: rgb(10 10 10 / 80%); }
+
+.cards.ranking .row-arrow:focus-visible {
+  outline: 3px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+.cards.ranking .cards-wrap .row-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (hover: none) {
+  .cards.ranking .row-arrow { display: none; }
+}
+
+/* Descripción de las cards: máximo 2 líneas para que la fila no se descuadre */
+.cards.ranking .card-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--color-text-inverse-muted);
+}
+
+/* Card de cierre de fila: la continuación de cada capítulo es la suscripción */
+.cards.ranking .card-cta {
+  justify-content: space-between;
+  gap: 24px;
+  padding: 32px;
+  text-decoration: none;
+  background: var(--gradient-premium);
+  color: var(--color-text-primary);
+}
+
+.cards.ranking .card-cta .eyebrow {
+  align-self: flex-start;
+  margin: 0;
+  background: var(--color-text-primary);
+  color: #fff;
+}
+
+.cards.ranking .card-cta h3 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -.5px;
+}
+
+/* :where() keeps the prototype specificity (0,2,0) so body[data-promo] .no-promo/.promo-only still win */
+:where(.cards.ranking) .card-cta .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cards.ranking .card-cta .go::after {
+  content: "→";
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  color: #fff;
+  transition: transform .2s ease;
+}
+
+.cards.ranking .card-cta:hover .go::after { transform: translateX(4px); }
+
+.cards.ranking .card-cta:focus-visible {
+  outline: 3px solid var(--color-primary-light);
+  outline-offset: 4px;
+}
+
+/* RANK · badge numérico del Top 10: se ancla a la esquina de .thumb y lo recorta el radio de 32 px de la card */
+.cards.ranking .rank {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 0 0 12px;
+  background: linear-gradient(341deg,#3E31FA 27.3%,#8760F6 95.87%);
+  box-shadow: 5px 4px 4px 0 rgb(84 77 182 / 20%),0 0 6.7px 0 rgb(0 0 0 / 25%);
+  backdrop-filter: blur(3.7px);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  padding-left: 6px;
+  padding-bottom: 2px;
+}
+
+.cards.ranking .rank.wide {
+  font-size: 28px;
+  letter-spacing: -2px;
+  padding-left: 4px;
+}
+
+@media (width <= 479px) {
+  .cards.ranking .rank {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+
+  .cards.ranking .rank.wide { font-size: 23px; }
+}
+
+/* El número entra con la card, un pelín después */
+@media (prefers-reduced-motion: no-preference) {
+  .js .cards.ranking .cards-row > * .rank {
+    opacity: 0;
+    scale: .72;
+    transform-origin: top left;
+    transition: opacity .45s ease calc(var(--d,0ms) + 140ms),scale .45s cubic-bezier(.2,1.5,.4,1) calc(var(--d,0ms) + 140ms);
+  }
+
+  .js .cards.ranking .is-in > * .rank {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* ===== advantages — «Y además, siendo Madridista Premium» (prototype html:L615-637) ===== */
+.cards.advantages .perks-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+/* Una columna en móvil y tres desde tablet (con 2 columnas quedaba uno huérfano) */
+@media (width >= 768px) {
+  .cards.advantages .perks-grid { grid-template-columns: repeat(3,1fr); }
+}
+
+@media (width >= 1440px) {
+  .cards.advantages .perks-grid { gap: var(--grid-gutter-wide); }
+}
+
+.cards.advantages .perk {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 32px 24px;
+  border-radius: var(--radius-3xl);
+  background: var(--gradient-card-dark);
+  border: 1px solid rgb(255 255 255 / 8%);
+  box-shadow: var(--shadow-card-tier);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .35s ease;
+}
+
+.cards.advantages .perk-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-lg);
+  background: var(--color-premium-tint);
+  border: 1px solid var(--color-premium-line);
+  color: var(--color-premium-start);
+}
+
+.cards.advantages .perk-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: currentcolor;
+}
+
+.cards.advantages .perk h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.cards.advantages .perk p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-text-inverse-muted);
+}
+
+.cards.advantages .perk-num {
+  font-weight: 700;
+  color: var(--color-premium-start);
+}
+
+@media (hover: hover) {
+  .cards.advantages .perk:hover {
+    border-color: var(--color-premium-line-strong);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+/* Entrada más marcada que el resto de la página: suben 48 px y crecen del 94 % al 100 % */
+@media (prefers-reduced-motion: no-preference) {
+  .js .cards.advantages .perks-grid > .perk {
+    translate: 0 48px;
+    scale: .94;
+    transition: transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .35s ease,
+      opacity .7s ease var(--d,0ms),translate .8s cubic-bezier(.16,1,.3,1) var(--d,0ms),scale .8s cubic-bezier(.16,1,.3,1) var(--d,0ms);
+  }
+
+  .js .cards.advantages .perks-grid.is-in > .perk {
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cards.advantages .perk:hover { transform: translateY(-6px); }
 }

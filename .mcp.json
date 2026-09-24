@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "da-live-admin": {
+      "type": "http",
+      "url": "https://da-mcp.adobeaem.workers.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer ${DA_TOKEN}"
+      }
+    }
+  }
+}

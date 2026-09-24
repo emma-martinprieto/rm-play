@@ -10,7 +10,11 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  getMetadata,
+  readBlockConfig,
+  toClassName,
 } from './aem.js';
+import { getImageSrc, cssUrl } from './utils.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
@@ -37,16 +41,68 @@ if (window.trustedTypes && window.trustedTypes.createPolicy) {
   });
 }
 
-/**
- * load fonts.css and set a session storage flag
+/*
+ * Fonts: the prototype ships no font files. The declared stack
+ * ("RM Neue","Inter",-apple-system,…) is used as-is, so no fonts.css is loaded.
  */
-async function loadFonts() {
-  await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
-  try {
-    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
-  } catch (e) {
-    // do nothing
-  }
+
+/**
+ * Local-preview fallback: the aem.live pipeline turns the page `metadata` table
+ * into <meta> tags, but `aem up --html-folder` serves it as a block. Emulate the
+ * pipeline (only when the table is still in the DOM) and drop the table.
+ * @param {Element} main The main element
+ */
+function applyInlineMetadata(main) {
+  main.querySelectorAll(':scope > div > .metadata').forEach((block) => {
+    const config = readBlockConfig(block);
+    Object.entries(config).forEach(([key, value]) => {
+      const val = Array.isArray(value) ? value.join(', ') : value;
+      if (key === 'title') {
+        document.title = val;
+        return;
+      }
+      if (!document.head.querySelector(`meta[name="${key}"]`)) {
+        const meta = document.createElement('meta');
+        meta.name = key;
+        meta.content = val;
+        document.head.append(meta);
+      }
+    });
+    const parent = block.parentElement;
+    block.remove();
+    if (!parent.children.length) parent.remove();
+  });
+}
+
+/**
+ * Applies section-metadata (Style → classes, Background → inline background
+ * image, other keys → data attributes). The stripped aem.js does not do it.
+ * @param {Element} main The main element
+ */
+function decorateSectionMetadata(main) {
+  main.querySelectorAll(':scope > .section > div > .section-metadata').forEach((sm) => {
+    const section = sm.closest('.section');
+    [...sm.children].forEach((row) => {
+      const [keyCell, valueCell] = row.children;
+      if (!keyCell || !valueCell) return;
+      const key = toClassName(keyCell.textContent);
+      if (key === 'style') {
+        valueCell.textContent.split(',').map((s) => toClassName(s.trim())).filter(Boolean)
+          .forEach((c) => section.classList.add(c));
+      } else if (key === 'background') {
+        const src = getImageSrc(valueCell);
+        if (src) {
+          section.dataset.background = src;
+          section.style.backgroundImage = cssUrl(src);
+        }
+      } else {
+        section.dataset[key.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = valueCell.textContent.trim();
+      }
+    });
+    const wrapper = sm.parentElement;
+    sm.remove();
+    if (!wrapper.children.length) wrapper.remove();
+  });
 }
 
 /**
@@ -151,6 +207,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateSectionMetadata(main);
   decorateBlocks(main);
   decorateButtons(main);
 }
@@ -160,22 +217,16 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  document.documentElement.lang = 'es';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
+  if (main) applyInlineMetadata(main);
+  /* Promo switch: prototype body[data-promo="on"], driven here by the `Promo` metadata */
+  if (getMetadata('promo') === 'on') document.body.dataset.promo = 'on';
   if (main) {
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
-  }
-
-  try {
-    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
-    if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
-      loadFonts();
-    }
-  } catch (e) {
-    // do nothing
   }
 }
 
@@ -196,7 +247,6 @@ async function loadLazy(doc) {
   loadFooter(doc.querySelector('body > footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
-  loadFonts();
 }
 
 /**

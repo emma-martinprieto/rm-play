@@ -1,0 +1,103 @@
+/* Final banner (prototype html:L639-665). Horizontal en desktop (mensaje a la izquierda, oferta a la derecha)
+   y apilado en móvil. */
+.final-banner .banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  gap: 32px;
+  align-items: end;
+  padding: 40px 24px;
+  border-radius: var(--radius-3xl);
+  background-color: var(--color-off-black);
+  background-size: cover;
+  background-position: 70% center;
+
+  /* padding-box: sin esto la foto asomaba bajo el borde semitransparente y el filo se veía a trozos */
+  background-clip: padding-box;
+  background-origin: border-box;
+  border: 1px solid var(--color-premium-line);
+  box-shadow: 0 32px 64px -32px rgb(0 0 0 / 80%);
+}
+
+.final-banner .banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg,rgb(10 10 10 / 55%) 0%,rgb(10 10 10 / 82%) 55%,rgb(10 10 10 / 94%) 100%);
+}
+
+@media (width >= 768px) {
+  .final-banner .banner { padding: 56px; }
+}
+
+@media (width >= 1024px) {
+  .final-banner .banner {
+    grid-template-columns: minmax(0,1.15fr) minmax(0,1fr);
+    align-items: center;
+    gap: 64px;
+    padding: 72px;
+  }
+
+  .final-banner .banner::before { background: linear-gradient(90deg,rgb(10 10 10 / 94%) 0%,rgb(10 10 10 / 78%) 48%,rgb(10 10 10 / 60%) 100%); }
+}
+
+.final-banner .banner h2 {
+  margin: 0;
+  font-size: clamp(32px,4vw,52px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  max-width: 17ch;
+}
+
+/* Oferta en tres niveles: promo (etiqueta) → precio (protagonista) → mensual (apoyo) */
+.final-banner .banner-offer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.final-banner .banner .eyebrow { margin: 0 0 20px; }
+
+.final-banner .banner-promo {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-premium-start);
+}
+
+.final-banner .banner-price {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1;
+}
+
+.final-banner .banner-price strong {
+  font-size: clamp(40px,4vw,56px);
+  font-weight: 700;
+  letter-spacing: -2px;
+}
+
+.final-banner .banner-price span {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-inverse-muted);
+}
+
+.final-banner .banner-month {
+  margin: 8px 0 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-inverse-muted);
+}
+
+@media (width <= 479px) {
+  .final-banner .banner .btn { width: 100%; }
+}

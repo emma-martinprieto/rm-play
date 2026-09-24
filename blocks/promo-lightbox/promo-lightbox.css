@@ -1,0 +1,162 @@
+/* Promo lightbox (prototype html:L409-438). The <dialog> lives in <body>, so selectors are not block-prefixed. */
+.promo-modal {
+  width: min(100% - 32px,420px);
+  max-height: 90dvh;
+  overflow: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-3xl);
+  background: var(--color-surface-light);
+  color: var(--color-text-primary);
+  box-shadow: 0 32px 80px -24px rgb(20 20 43 / 60%);
+}
+
+.promo-modal::backdrop {
+  background: rgb(10 10 10 / 72%);
+  backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .promo-modal[open] { animation: promo-in .32s cubic-bezier(.2,.7,.2,1); }
+
+  @keyframes promo-in {
+    from {
+      opacity: 0;
+      translate: 0 16px;
+      scale: .98;
+    }
+
+    to {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+    }
+  }
+}
+
+.promo-modal form { margin: 0; }
+.promo-box { padding: 32px; }
+
+.promo-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-right: 48px;
+}
+
+/* El escudo embebido es la versión blanca del header: invertido se lee sobre el panel claro */
+.promo-crest {
+  width: 40px;
+  height: 56px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: invert(1);
+}
+
+.promo-modal h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  font-weight: 700;
+}
+
+.promo-modal .sub {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.promo-carnet {
+  aspect-ratio: 956/588;
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 12px 22px rgb(20 20 43 / 25%);
+}
+
+.promo-list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.promo-list li {
+  display: flex;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.promo-list .ck {
+  color: var(--color-text-primary);
+  font-weight: 800;
+}
+
+.promo-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.promo-price strong {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.promo-price span {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.promo-price s {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.promo-modal .btn { width: 100%; }
+
+/* 12 px: literal del código (brief §0) */
+.promo-note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.promo-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(15 33 69 / 6%);
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.promo-close:hover { background: rgb(15 33 69 / 12%); }
+
+.promo-close:focus-visible {
+  outline: 3px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
