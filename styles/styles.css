@@ -246,7 +246,7 @@ a.btn {
 
 .btn.light { box-shadow: none; }
 
-/* Botón principal del DS (gradiente violeta). Solo en el CTA del hero, por decisión de negocio (21/09/2026) */
+/* Botón principal del DS (gradiente violeta): CTA del hero, sticky bar y lightbox de promo */
 .btn.primary {
   color: #fff;
   background: var(--gradient-btn-primary);
@@ -263,14 +263,6 @@ a.btn {
   outline: 0;
   box-shadow: var(--btn-primary-shadow),var(--btn-focus-ring);
 }
-
-/* Sobre superficie clara (lightbox) el blanco desaparece: versión oscura */
-.btn.dark {
-  background: var(--color-off-black);
-  color: #fff;
-}
-
-.btn.dark:hover { background: #000; }
 
 /* Pill — misma forma y tipografía en hero, cards, beneficios y plan; cambia sólo el color */
 .eyebrow,

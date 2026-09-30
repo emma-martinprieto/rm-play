@@ -97,7 +97,7 @@ export default function decorate(block) {
     box.append(price);
   }
 
-  if (ctaRow) box.append(buildCta(ctaRow.querySelector('a'), 'btn dark', 'button'));
+  if (ctaRow) box.append(buildCta(ctaRow.querySelector('a'), 'btn primary', 'button'));
   if (noteRow) box.append(el('p', 'promo-note', noteRow.textContent.trim()));
 
   dialog.append(form, box);
