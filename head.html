@@ -8,3 +8,95 @@
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
 <link rel="stylesheet" href="/styles/styles.css"/>
+
+<script nonce="aem">
+  (function () {
+    if (window.trustedTypes && window.trustedTypes.createPolicy && !window.trustedTypes.defaultPolicy) {
+      var innerTT = window.trustedTypes.createPolicy('tt-inner', {
+        createHTML: function (s) { return s; }
+      });
+
+      window.trustedTypes.createPolicy('default', {
+        createHTML: function (input, type, sink) {
+          var processedInput = input;
+          if (/srcdoc\s*=/i.test(processedInput)) {
+            var doc1 = new DOMParser().parseFromString(innerTT.createHTML(processedInput), 'text/html');
+            doc1.querySelectorAll('iframe[srcdoc]').forEach(function (el) { el.removeAttribute('srcdoc'); });
+            processedInput = doc1.body.innerHTML;
+          }
+          if (sink.includes('createContextualFragment') || sink.includes('Document write')) {
+            var doc2 = new DOMParser().parseFromString(innerTT.createHTML(processedInput), 'text/html');
+            doc2.querySelectorAll('script').forEach(function (el) { el.remove(); });
+            processedInput = doc2.body.innerHTML;
+          }
+          return processedInput;
+        },
+        createScriptURL: function (input) { return input; },
+        createScript: function (input) { return input; }
+      });
+    }
+
+    var host = window.location.hostname;
+    var path = window.location.pathname;
+
+    function leerMetadato(nombre) {
+      var el = document.querySelector('meta[name="' + nombre + '"]');
+      return el ? el.content.trim() : '';
+    }
+
+    var esRealMadrid = /(^|\.)realmadrid\.com$/.test(host);
+    var esMadridistas = /(^|\.)madridistas\.com$/.test(host);
+    var esProduccion = esRealMadrid || esMadridistas;
+
+    var oneTrustId = esRealMadrid
+      ? '69ad9e0c-e5c8-4c48-a86c-58c47a28c517'
+      : '22a2ad6c-055f-488c-a71e-13ecc9969a0e';
+
+    window.OptanonWrapper = function () {
+      if (typeof window.RMOneTrustLoaded === 'undefined' || window.RMOneTrustLoaded !== true) {
+        window.RMOneTrustLoaded = true;
+        window.dispatchEvent(new Event('RMOneTrustLoaded'));
+      }
+    };
+
+    var ot = document.createElement('script');
+    ot.src = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
+    ot.type = 'text/javascript';
+    ot.charset = 'UTF-8';
+    ot.setAttribute('data-document-language', 'true');
+    ot.setAttribute('data-domain-script', oneTrustId);
+    document.head.appendChild(ot);
+
+    var idioma = leerMetadato('analytics-lang') || (/^\/en(\/|$)/.test(path) ? 'en' : 'es');
+    var pais = idioma === 'en' ? 'us' : 'es';
+    var level3 = leerMetadato('analytics-page-level3') || 'rmplay_join_premium';
+
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'pageLoad',
+      webPageDetails: {
+        pageName: 'madridistas:landing:acquisition:' + level3,
+        pageURL: location.href,
+        pageSection: 'madridistas',
+        pageLevel1: 'landing',
+        pageLevel2: 'acquisition',
+        pageLevel3: level3,
+        pageLevel4: '',
+        pageType: 'landing',
+        pagePath: location.pathname,
+        pageTitle: document.title,
+        pageLoadType: 'sequential',
+        cms: 'aem',
+        pageLang: idioma,
+        country: pais
+      }
+    });
+
+    var launch = document.createElement('script');
+    launch.src = esProduccion
+      ? 'https://assets.adobedtm.com/ab05854e772b/386400a5741e/launch-19612895918c.min.js'
+      : 'https://assets.adobedtm.com/ab05854e772b/386400a5741e/launch-938e6c931256-development.min.js';
+    launch.async = true;
+    document.head.appendChild(launch);
+  })();
+</script>
