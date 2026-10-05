@@ -132,7 +132,22 @@ function keepLastWordTogether(heading) {
   if (last) last.textContent = last.textContent.replace(/\s+(\S{1,3})(\s*)$/, ' $1$2');
 }
 
+/* Última fila con contenido solo en la primera celda (combinada o con el resto vacías):
+   mensaje y enlace del candado, autorados una vez para todas las tarjetas */
+function readLockRow(block) {
+  const row = block.lastElementChild;
+  if (!row || block.children.length < 2) return {};
+  const [first, ...rest] = [...row.children];
+  if (!first || rest.some((c) => c.textContent.trim() || c.querySelector('img'))) return {};
+  row.remove();
+  const link = first.querySelector('a');
+  const p = [...first.querySelectorAll('p')].find((x) => !x.querySelector('a') && x.textContent.trim());
+  const text = p ? p.textContent.trim() : '';
+  return { text: text || (link ? '' : first.textContent.trim()), link };
+}
+
 function decorateCategories(block) {
+  const lockContent = readLockRow(block);
   const nav = el('div', 'cat-nav');
   const prev = el('button', 'cat-arrow prev');
   prev.type = 'button';
@@ -176,7 +191,7 @@ function decorateCategories(block) {
   block.replaceChildren(nav, panels);
   keepLastWordTogether(block.closest('.section')?.querySelector('.default-content-wrapper > h2'));
   bindCategories(block);
-  panels.querySelectorAll('.cat-grid > article.card').forEach(registerLockableCard);
+  panels.querySelectorAll('.cat-grid > article.card').forEach((card) => registerLockableCard(card, lockContent));
 }
 
 /* Generic tabs fallback: first cell = tab label, rest = panel */

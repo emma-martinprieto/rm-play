@@ -5,6 +5,8 @@
  * click outside / Escape closes it (Escape returns focus to the card).
  */
 
+import { buildCta } from './utils.js';
+
 export const LOCK = '<svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>';
 
 let documentBound = false;
@@ -32,8 +34,8 @@ function bindDocument() {
   });
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export function registerLockableCard(card) {
+/* content (optional, authored in DA): { text, link } — the default markup is used without it */
+export function registerLockableCard(card, content = {}) {
   if (!card.querySelector('.tag') && !card.classList.contains('tile')) return;
   bindDocument();
   const title = card.querySelector('h3').textContent.replace(/^\d+\.\s*/, '');
@@ -47,6 +49,10 @@ export function registerLockableCard(card) {
   lock.innerHTML = `<span class="lock-icon" aria-hidden="true">${LOCK}</span>`
     + '<p>Disponible con Madridista Premium</p>'
     + '<button type="button" class="btn">Hazte Madridista Premium</button>';
+  if (content.text) lock.querySelector('p').textContent = content.text;
+  if (content.link && content.link.textContent.trim()) {
+    lock.querySelector('.btn').replaceWith(buildCta(content.link, 'btn', 'button'));
+  }
   card.querySelector('.thumb').appendChild(lock);
   card.appendChild(open);
   open.addEventListener('click', () => {
