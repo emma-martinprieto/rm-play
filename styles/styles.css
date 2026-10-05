@@ -62,6 +62,7 @@
   --color-glass-92: rgb(255 255 255 / 92%);
   --color-glass-72: rgb(255 255 255 / 72%);
   --color-glass-dark: rgb(10 10 10 / 75%); /* barra sticky: deja intuir el contenido de detrás */
+  --color-glass-12: rgb(255 255 255 / 12%); /* 🆕 relleno del número en contorno y filo del póster (Top 10) */
   --color-line-inverse: rgb(255 255 255 / 24%); /* 🆕 filo de controles sobre fondo oscuro (selector de idioma, flechas de fila) */
 
   /* Gradientes ✅ */
