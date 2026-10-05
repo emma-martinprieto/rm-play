@@ -15,6 +15,7 @@ import {
   toClassName,
 } from './aem.js';
 import { getImageSrc, cssUrl } from './utils.js';
+import './campaign.js';
 
 /*
  * Fonts: the prototype ships no font files. The declared stack
