@@ -182,49 +182,6 @@
   .tabs.categories .tile-cap p { display: none; }
 }
 
-/* Placeholder de asset pendiente — mejor un hueco honesto que un recorte mal encuadrado */
-.tabs.categories .ph-icon {
-  width: 52px;
-  height: 52px;
-  fill: rgb(255 255 255 / 22%);
-}
-
-.tabs.categories .ph-label {
-  font-size: 14px;
-  line-height: 16px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 46%);
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgb(255 255 255 / 18%);
-}
-
-.tabs.categories .thumb.ph {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: repeating-linear-gradient(135deg,rgb(255 255 255 / 3.5%) 0 10px,rgb(255 255 255 / 0%) 10px 20px),var(--color-off-black);
-}
-
-.tabs.categories .thumb.ph::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border-radius: 12px;
-  border: 1.5px dashed rgb(255 255 255 / 16%);
-}
-
-.tabs.categories .thumb.ph .ph-icon {
-  width: 40px;
-  height: 40px;
-}
-
-.tabs.categories .thumb.ph .ph-label { font-size: 12px; }
-
 /* Entrada de los 4 contenidos al cambiar de categoría (y al llegar a la sección) */
 @media (prefers-reduced-motion: no-preference) {
   .js .tabs.categories .cat-grid > * { opacity: 0; }

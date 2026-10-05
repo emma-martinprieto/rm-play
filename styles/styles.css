@@ -371,6 +371,7 @@ body:not([data-promo="on"]) .promo-only { display: none; }
 .section.discover .default-content-wrapper > h2 {
   text-align: left;
   margin-bottom: 40px;
+  max-width: none; /* en web el título entra en una sola línea */
 }
 
 /* 04 · .perks → .section.membership (html:L611-614; .perks gana a .chapter) */

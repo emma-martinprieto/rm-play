@@ -4,7 +4,6 @@ import { registerLockableCard } from '../../scripts/card-lock.js';
 
 const PREV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
 const NEXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
-const PH_ICON = '<svg class="ph-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>';
 
 /* Prototype per-image framing (html:L585-586, 607-608). DA renames images on upload,
    so the framing is keyed by card title (EDS adjustment). */
@@ -13,6 +12,7 @@ const FRAMING = {
   'Dean Huijsen': '48% 30%',
   'Jude Bellingham': '48% 25%',
   Documentales: 'center 8%',
+  'Player Cam': 'left center',
 };
 
 function el(tag, className, text) {
@@ -39,10 +39,9 @@ function buildTile(cell) {
     if (FRAMING[title]) art.style.backgroundPosition = FRAMING[title];
     thumb.append(art, cap);
   } else {
-    /* Marcador de asset pendiente («Por pedir»), como en el prototipo */
-    thumb = el('div', 'thumb ph');
-    thumb.innerHTML = PH_ICON;
-    thumb.append(el('span', 'ph-label', 'Por pedir'), cap);
+    /* Sin imagen: solo el fondo oscuro de la card (gradient/card-dark) y el rótulo */
+    thumb = el('div', 'thumb');
+    thumb.append(cap);
   }
   card.append(thumb);
   return card;
@@ -123,6 +122,16 @@ function bindCategories(sec) {
   io.observe(area);
 }
 
+/* El título de la sección acaba en una preposición corta («…descubrir en», «…discover in»):
+   si parte en dos líneas, la última palabra (hasta 3 letras) baja con la anterior */
+function keepLastWordTogether(heading) {
+  if (!heading) return;
+  const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+  let last = null;
+  while (walker.nextNode()) if (walker.currentNode.textContent.trim()) last = walker.currentNode;
+  if (last) last.textContent = last.textContent.replace(/\s+(\S{1,3})(\s*)$/, ' $1$2');
+}
+
 function decorateCategories(block) {
   const nav = el('div', 'cat-nav');
   const prev = el('button', 'cat-arrow prev');
@@ -165,6 +174,7 @@ function decorateCategories(block) {
   });
 
   block.replaceChildren(nav, panels);
+  keepLastWordTogether(block.closest('.section')?.querySelector('.default-content-wrapper > h2'));
   bindCategories(block);
   panels.querySelectorAll('.cat-grid > article.card').forEach(registerLockableCard);
 }
