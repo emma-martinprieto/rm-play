@@ -54,10 +54,11 @@ export default function decorate(block) {
   }
   bar.append(priceWrap);
 
+  let btn = null;
   if (ctaRow) {
     const link = ctaRow.querySelector('a');
     const shortP = [...ctaRow.querySelectorAll('p')].find((p) => !p.querySelector('a') && p.textContent.trim());
-    const btn = buildCta(link, 'btn primary');
+    btn = buildCta(link, 'btn primary');
     const long = el('span', 'label-long', link.textContent.trim());
     const short = el('span', 'label-short', shortP ? shortP.textContent.trim() : link.textContent.trim());
     btn.replaceChildren(long, short);
@@ -75,4 +76,13 @@ export default function decorate(block) {
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  /* Cambio 03: una tarjeta de categoría marcada (tabs) levanta la barra, aunque aún no se vea,
+     y le pasa el foco al botón. Estado en <body> por si la tarjeta se marcó antes de decorar. */
+  function lift(on) {
+    bar.classList.toggle('is-lifted', on);
+    if (on && btn) btn.focus({ preventScroll: true });
+  }
+  document.addEventListener('rmplay:premium-hint', (e) => lift(e.detail.active));
+  if (document.body.dataset.premiumHint === 'on') bar.classList.add('is-lifted');
 }

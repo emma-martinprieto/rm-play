@@ -1,6 +1,6 @@
 import { toClassName } from '../../scripts/aem.js';
 import { getImageSrc, cssUrl } from '../../scripts/utils.js';
-import { registerLockableCard } from '../../scripts/card-lock.js';
+import { LOCK } from '../../scripts/card-lock.js';
 
 const PREV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
 const NEXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
@@ -47,8 +47,116 @@ function buildTile(cell) {
   return card;
 }
 
+/* Cambio 03: tocar una tarjeta solo la marca con un candado (sin giro ni CTA en la tarjeta);
+   el alta está en la barra sticky, que se levanta. Aviso sin importar el bloque: evento en
+   document + estado en <body> por si la barra se decora después. */
+const HINT = 'rmplay:premium-hint';
+
+function hint(active) {
+  if (active) document.body.dataset.premiumHint = 'on';
+  else delete document.body.dataset.premiumHint;
+  document.dispatchEvent(new CustomEvent(HINT, { detail: { active } }));
+}
+
+function bindMarking(block, message) {
+  const live = el('p', 'sr-only');
+  live.setAttribute('aria-live', 'polite');
+  block.append(live);
+  let marked = null;
+  let seen = false;
+  let swipedAt = 0;
+
+  let io = null;
+
+  function unmark(focusCard) {
+    if (!marked) return;
+    const card = marked;
+    marked = null;
+    if (io) io.unobserve(card);
+    card.classList.remove('is-marked');
+    card.querySelector('.card-open').setAttribute('aria-pressed', 'false');
+    live.textContent = '';
+    hint(false);
+    if (focusCard) card.querySelector('.card-open').focus({ preventScroll: true });
+  }
+
+  /* Desmarca solo al pasar de verse (≥50 %) a no verse: la primera notificación al observar
+     una tarjeta que ya está por debajo del 50 % no cuenta */
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.target !== marked) return;
+        if (e.intersectionRatio >= 0.5) seen = true;
+        else if (seen) unmark(false);
+      });
+    }, { threshold: 0.5 });
+  }
+
+  function mark(card) {
+    if (marked) {
+      marked.classList.remove('is-marked');
+      marked.querySelector('.card-open').setAttribute('aria-pressed', 'false');
+      if (io) io.unobserve(marked);
+    }
+    marked = card;
+    seen = false;
+    card.classList.add('is-marked');
+    card.querySelector('.card-open').setAttribute('aria-pressed', 'true');
+    if (io) io.observe(card);
+    if (message) {
+      live.textContent = '';
+      setTimeout(() => { if (marked === card) live.textContent = message; }, 100);
+    }
+    hint(true);
+  }
+
+  block.querySelectorAll('.cat-grid > article.card').forEach((card) => {
+    const title = card.querySelector('h3').textContent.trim();
+    const open = el('button', 'card-open');
+    open.type = 'button';
+    open.setAttribute('aria-label', message ? `${title} · ${message}` : title);
+    open.setAttribute('aria-pressed', 'false');
+    const lock = el('div', 'cat-lock');
+    lock.setAttribute('aria-hidden', 'true');
+    lock.innerHTML = `<span class="lock-icon">${LOCK}</span>`;
+    card.querySelector('.thumb').append(lock);
+    card.append(open);
+    open.addEventListener('click', () => {
+      if (Date.now() - swipedAt < 500) return;
+      if (marked === card) unmark(false);
+      else mark(card);
+    });
+  });
+
+  /* Deslizar sobre las tarjetas (cambio de pestaña) no marca ninguna */
+  const area = block.querySelector('.cat-panels');
+  let sx = 0;
+  let sy = 0;
+  area.addEventListener('touchstart', (e) => {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, { passive: true });
+  area.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0];
+    if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) swipedAt = Date.now();
+  });
+
+  /* Fuera = ni una tarjeta de este bloque ni la barra (su botón abre el enlace con normalidad) */
+  document.addEventListener('click', (e) => {
+    if (!marked) return;
+    const t = e.target;
+    if ((block.contains(t) && t.closest('.cat-grid .card')) || t.closest('body > .sticky')) return;
+    unmark(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && marked) unmark(true);
+  });
+
+  return () => unmark(false);
+}
+
 /* Prototype script 7: accessible tabs, centred active tab, circular arrows, swipe, reveal */
-function bindCategories(sec) {
+function bindCategories(sec, onChange) {
   const track = sec.querySelector('.cat-track');
   const viewport = sec.querySelector('.cat-viewport');
   const tabs = [...sec.querySelectorAll('.cat-tab')];
@@ -75,6 +183,7 @@ function bindCategories(sec) {
     panels[i].hidden = false;
     if (focus) tabs[i].focus({ preventScroll: true });
     center();
+    if (onChange) onChange();
   }
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => go(i));
@@ -133,21 +242,22 @@ function keepLastWordTogether(heading) {
 }
 
 /* Última fila con contenido solo en la primera celda (combinada o con el resto vacías):
-   mensaje y enlace del candado, autorados una vez para todas las tarjetas */
+   mensaje del candado, autorado una vez para todas las tarjetas. Un enlace en esa fila
+   (versión anterior) se ignora. */
 function readLockRow(block) {
   const row = block.lastElementChild;
-  if (!row || block.children.length < 2) return {};
+  if (!row || block.children.length < 2) return '';
   const [first, ...rest] = [...row.children];
-  if (!first || rest.some((c) => c.textContent.trim() || c.querySelector('img'))) return {};
+  if (!first || rest.some((c) => c.textContent.trim() || c.querySelector('img'))) return '';
   row.remove();
-  const link = first.querySelector('a');
-  const p = [...first.querySelectorAll('p')].find((x) => !x.querySelector('a') && x.textContent.trim());
-  const text = p ? p.textContent.trim() : '';
-  return { text: text || (link ? '' : first.textContent.trim()), link };
+  const ps = [...first.querySelectorAll('p')];
+  if (!ps.length) return first.querySelector('a') ? '' : first.textContent.trim();
+  const p = ps.find((x) => !x.querySelector('a') && x.textContent.trim());
+  return p ? p.textContent.trim() : '';
 }
 
 function decorateCategories(block) {
-  const lockContent = readLockRow(block);
+  const lockMessage = readLockRow(block);
   const nav = el('div', 'cat-nav');
   const prev = el('button', 'cat-arrow prev');
   prev.type = 'button';
@@ -190,8 +300,7 @@ function decorateCategories(block) {
 
   block.replaceChildren(nav, panels);
   keepLastWordTogether(block.closest('.section')?.querySelector('.default-content-wrapper > h2'));
-  bindCategories(block);
-  panels.querySelectorAll('.cat-grid > article.card').forEach((card) => registerLockableCard(card, lockContent));
+  bindCategories(block, bindMarking(block, lockMessage));
 }
 
 /* Generic tabs fallback: first cell = tab label, rest = panel */

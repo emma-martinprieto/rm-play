@@ -182,6 +182,41 @@
   .tabs.categories .tile-cap p { display: none; }
 }
 
+/* Tarjeta marcada (Cambio 03): solo el candado centrado sobre un velo; el alta está en la barra
+   sticky. Velo glass-dark al 55 % (literal, sin token) y sin desenfoque. .lock-icon: styles.css */
+.tabs.categories .cat-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  background: rgb(10 10 10 / 55%);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s cubic-bezier(.2,.7,.2,1),visibility 0s linear .25s;
+}
+
+.tabs.categories .card.is-marked .cat-lock {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .25s cubic-bezier(.2,.7,.2,1);
+}
+
+.tabs.categories .cat-lock .lock-icon {
+  scale: .8;
+  transition: scale .25s cubic-bezier(.2,.7,.2,1);
+}
+
+.tabs.categories .card.is-marked .cat-lock .lock-icon { scale: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tabs.categories .cat-lock .lock-icon {
+    scale: 1;
+    transition: none;
+  }
+}
+
 /* Entrada de los 4 contenidos al cambiar de categoría (y al llegar a la sección) */
 @media (prefers-reduced-motion: no-preference) {
   .js .tabs.categories .cat-grid > * { opacity: 0; }
