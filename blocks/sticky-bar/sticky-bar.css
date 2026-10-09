@@ -23,7 +23,7 @@
 .sticky.is-visible { transform: translateY(0); }
 
 /* Cambio 03: con una tarjeta de categoría marcada, la barra sube (aunque estuviera oculta) y el
-   botón se ilumina con un halo premium-tint que late una vez */
+   botón se ilumina con un halo dorado que late una vez */
 .sticky.is-lifted {
   transform: translateY(-8px);
   box-shadow: 0 -8px 32px rgb(0 0 0 / 50%);
@@ -36,7 +36,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: 0 0 16px 4px var(--color-premium-tint);
+  box-shadow: 0 0 16px 4px rgb(228 208 171 / 55%); /* --color-premium-start al 55 % (Figma) */
   opacity: 0;
   pointer-events: none;
   transition: opacity .3s ease;
