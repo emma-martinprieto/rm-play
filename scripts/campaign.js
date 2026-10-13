@@ -1,7 +1,8 @@
 const COLAS = {
-  '.hero': 'wl-rmplay-header',
-  '.cards.ranking.poster': 'wl-rmplay-carrousel',
-  'body > .sticky': 'wl-rmplay-sticky',
+  '.hero': 'gl184-rmplay-header',
+  '.cards.ranking.poster': 'gl184-rmplay-carrousel',
+  'body > .sticky': 'gl184-rmplay-sticky',
+  '.final-banner': 'gl184-rmplay-footer',
 };
 
 const DEFAULT_CAMPAIGN_ID = '970c1933-6906-4d2f-a676-81206a945813';
