@@ -131,6 +131,20 @@
 
 .tabs.categories .cat-grid[hidden] { display: none; }
 
+/* Foto como <img> (alt de DA) dentro de .art: mismo recorte que el background cover que sustituye;
+   el encuadre de FRAMING llega como object-position inline */
+.tabs.categories .thumb .art picture,
+.tabs.categories .thumb .art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tabs.categories .thumb .art img {
+  object-fit: cover;
+  object-position: center;
+}
+
 /* Tile: la imagen es la card; título sobre la foto como en la referencia */
 .tabs.categories .tile { border-radius: 16px; }
 .tabs.categories .tile .thumb { aspect-ratio: 16/10; }

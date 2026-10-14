@@ -215,7 +215,8 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'es';
+  /* lang llega del servidor (metadata html-lang); 'es' solo si falta */
+  if (!document.documentElement.lang) document.documentElement.lang = 'es';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) applyInlineMetadata(main);

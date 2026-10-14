@@ -26,6 +26,13 @@
 
 .accordion .faq summary::-webkit-details-marker { display: none; }
 
+/* La pregunta es un <h3> (SEO): hereda del summary, sin tamaño ni márgenes propios */
+.accordion .faq summary h3 {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+
 .accordion .faq ul {
   margin: 12px 0 0;
   padding-left: 20px;

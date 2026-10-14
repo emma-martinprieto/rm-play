@@ -1,12 +1,12 @@
-import { toClassName } from '../../scripts/aem.js';
-import { getImageSrc, cssUrl } from '../../scripts/utils.js';
+import { toClassName, createOptimizedPicture } from '../../scripts/aem.js';
+import { getImageSrc } from '../../scripts/utils.js';
 import { LOCK } from '../../scripts/card-lock.js';
 
 const PREV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
 const NEXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
 
-/* Prototype per-image framing (html:L585-586, 607-608). DA renames images on upload,
-   so the framing is keyed by card title (EDS adjustment). */
+/* Prototype per-image framing (html:L585-586, 607-608), applied as object-position. DA renames
+   images on upload, so the framing is keyed by card title (EDS adjustment). */
 const FRAMING = {
   'Thibaut Courtois': '50% 40%',
   'Dean Huijsen': '48% 30%',
@@ -35,8 +35,13 @@ function buildTile(cell) {
   if (src) {
     thumb = el('div', 'thumb');
     const art = el('div', 'art');
-    art.style.backgroundImage = cssUrl(src);
-    if (FRAMING[title]) art.style.backgroundPosition = FRAMING[title];
+    /* <img> con el alt de DA (antes background-image): object-fit/object-position recortan igual */
+    const authored = cell.querySelector('img');
+    const picture = createOptimizedPicture(src, authored.getAttribute('alt') || '', false, [{ width: '750' }]);
+    const img = picture.querySelector('img');
+    ['width', 'height'].forEach((a) => { if (authored.getAttribute(a)) img.setAttribute(a, authored.getAttribute(a)); });
+    if (FRAMING[title]) img.style.objectPosition = FRAMING[title];
+    art.append(picture);
     thumb.append(art, cap);
   } else {
     /* Sin imagen: solo el fondo oscuro de la card (gradient/card-dark) y el rótulo */
